@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.Xfermode;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -27,6 +28,9 @@ import com.hangox.xlog.XLog;
 
 public class PolygonImageView extends ImageView {
 
+    //使用到的两个蒙版模式
+    private Xfermode mDstInXfermode = new PorterDuffXfermode(PorterDuff.Mode.DST_IN);
+    private Xfermode mDstOverInXfermode  = new PorterDuffXfermode(PorterDuff.Mode.DST_OVER);
 
 
     /**
@@ -158,12 +162,12 @@ public class PolygonImageView extends ImageView {
             canvas.translate(mBorderSize,mBorderSize);
             float scale = mImageRect.width() * 1F / mClipModelBitmap.getWidth();
             canvas.scale(scale,scale);
-            mFinalPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+            mFinalPaint.setXfermode(mDstInXfermode);
             canvas.drawBitmap(mClipModelBitmap, 0, 0, mFinalPaint);
             canvas.restore();
             //画边界
             canvas.save();
-            mFinalPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
+            mFinalPaint.setXfermode(mDstOverInXfermode);
             canvas.drawBitmap(mClipModelBitmap, 0, 0, mFinalPaint);
             canvas.restore();
 
