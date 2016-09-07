@@ -27,6 +27,8 @@ import com.hangox.xlog.XLog;
 
 public class PolygonImageView extends ImageView {
 
+
+
     /**
      * 边框颜色
      */
@@ -38,11 +40,6 @@ public class PolygonImageView extends ImageView {
     private int mBorderSize;
 
     private float mImageScale;
-    /**
-     * 是否正方形
-     */
-    private boolean isSquare;
-
     /**
      * 多边形图像
      */
@@ -100,7 +97,6 @@ public class PolygonImageView extends ImageView {
         TypedArray t = context.obtainStyledAttributes(attrs, R.styleable.PolygonImageView, defStyleAttr, defStyleRes);
         mBorderSize = t.getDimensionPixelSize(R.styleable.PolygonImageView_piv_borderWidth, 0);
         mClipModelDrawable = t.getDrawable(R.styleable.PolygonImageView_piv_polygonImage);
-        isSquare = t.getBoolean(R.styleable.PolygonImageView_piv_square, true);
         mBorderColor = t.getColor(R.styleable.PolygonImageView_piv_borderColor, Color.WHITE);
         t.recycle();
 
@@ -122,8 +118,9 @@ public class PolygonImageView extends ImageView {
         boolean isValid = width > 0 && height > 0;
         if (isValid && (mFinalCanvas == null || sizeChanged)) {
             //draw clipImage;
-            mClipModelBitmap = Bitmap.createBitmap(mImageRect.width(), mImageRect.height(), Bitmap.Config.ARGB_8888);
-            mClipModelDrawable.setBounds(0, 0, mImageRect.width(), mImageRect.height());
+            if(mClipModelBitmap != null && !mClipModelBitmap.isRecycled()) mClipModelBitmap.recycle();
+            mClipModelBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            mClipModelDrawable.setBounds(0, 0, width, height);
             Canvas canvas = new Canvas(mClipModelBitmap);
             mClipModelDrawable.draw(canvas);
             //把图片变为边界颜色
@@ -145,33 +142,34 @@ public class PolygonImageView extends ImageView {
     @Override
     protected void onDraw(Canvas oCanvas) {
 
-        Canvas canvas = mFinalCanvas;
-//        if (!isInEditMode()) {
-        //画图像
-        canvas.save();
-        Drawable d = getDrawable();
-        canvas.clipRect(mImageRect);//裁剪为正方形
-        canvas.concat(mMatrix);
-        d.draw(canvas);
-        canvas.restore();
+        if (getDrawable() != null) {
+            Canvas canvas = mFinalCanvas;
+            //画图像
+            canvas.save();
+            Drawable d = getDrawable();
+            canvas.clipRect(mImageRect);//裁剪为正方形
+            canvas.concat(mMatrix);
+            d.draw(canvas);
+            canvas.restore();
 
 
-        //画形状
-        canvas.save();
-        canvas.scale(mScaleSize, mScaleSize);
-        canvas.translate(mBorderSize, mBorderSize);
-        mFinalPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-        canvas.drawBitmap(mClipModelBitmap, 0, 0, mFinalPaint);
-        canvas.restore();
-        //画边界
-        canvas.save();
-        mFinalPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
-        canvas.drawBitmap(mClipModelBitmap, 0, 0, mFinalPaint);
-        canvas.restore();
+            //画形状
+            canvas.save();
+            canvas.translate(mBorderSize,mBorderSize);
+            float scale = mImageRect.width() * 1F / mClipModelBitmap.getWidth();
+            canvas.scale(scale,scale);
+            mFinalPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+            canvas.drawBitmap(mClipModelBitmap, 0, 0, mFinalPaint);
+            canvas.restore();
+            //画边界
+            canvas.save();
+            mFinalPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
+            canvas.drawBitmap(mClipModelBitmap, 0, 0, mFinalPaint);
+            canvas.restore();
 
-        mFinalPaint.setXfermode(null);
-        oCanvas.drawBitmap(mFinalBitmap, 0, 0, mFinalPaint);
-//        }
+            mFinalPaint.setXfermode(null);
+            oCanvas.drawBitmap(mFinalBitmap, 0, 0, mFinalPaint);
+        }
 
     }
 

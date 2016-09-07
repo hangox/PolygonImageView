@@ -18,8 +18,8 @@
       android:src="@drawable/guo_ye"
       app:piv_borderWidth="6dp"
       app:piv_borderColor="@android:color/white"
-      app:piv_polygonImage="@drawable/star"
-      android:layout_width="match_parent"
+      app:piv_polygonImage="@drawable/polygon"
+      android:layout_width="100dp"
       android:layout_height="match_parent"/>
 
 
