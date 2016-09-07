@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/guo_ye"
-        app:piv_borderColor="@android:color/white"
+        app:piv_borderColor="@android:color/transparent"
         app:piv_borderWidth="6dp"
         app:piv_polygonImage="@drawable/star"/>
 

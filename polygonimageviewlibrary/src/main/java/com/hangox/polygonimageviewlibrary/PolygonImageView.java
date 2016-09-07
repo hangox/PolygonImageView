@@ -3,10 +3,8 @@ package com.hangox.polygonimageviewlibrary;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.MaskFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -52,10 +50,7 @@ public class PolygonImageView extends ImageView {
      */
     private Drawable mClipModelDrawable;
 
-    /**
-     * 是否更新过图像,更新过之后要重新生成图像
-     */
-    private boolean isInvalidated;
+
 
     /**
      * 最终的图片
@@ -67,16 +62,26 @@ public class PolygonImageView extends ImageView {
      */
     private Canvas mFinalCanvas;
 
-    private Matrix mMatrix = new Matrix();
-    private float mScaleSize;
+    /**
+     * 显示图片用的矩阵
+     */
+    private Matrix mFinalMatrix = new Matrix();
 
+
+    /**
+     * 最终图片的画笔
+     */
     private Paint mFinalPaint;
 
     /**
+     * 可绘画区域
      * 留条后路,看看以后有没有必要支持padding
      */
     private Rect mCanDrawRect = new Rect();
 
+    /**
+     * 图像的边界
+     */
     private Rect mImageRect = new Rect();
 
     /**
@@ -99,8 +104,15 @@ public class PolygonImageView extends ImageView {
      */
     private int mViewSize = Integer.MIN_VALUE;
 
-    private Paint mClearPaint = new Paint();
+    /**
+     * 是否绘制边界
+     */
+    private boolean isDrawBorder;
 
+    /**
+     * 是否裁剪图片
+     */
+    private boolean isClipPicture;
 
 
     public PolygonImageView(Context context) {
@@ -129,6 +141,11 @@ public class PolygonImageView extends ImageView {
         mBorderSize = t.getDimensionPixelSize(R.styleable.PolygonImageView_piv_borderWidth, 0);
         mClipModelDrawable = t.getDrawable(R.styleable.PolygonImageView_piv_polygonImage);
         mBorderColor = t.getColor(R.styleable.PolygonImageView_piv_borderColor, Color.WHITE);
+        isClipPicture = mClipModelDrawable != null;
+        //边界不为0,颜色不为透明,边界图不为空的时候绘画边界
+        isDrawBorder = mClipModelDrawable != null
+                && mBorderColor != Color.TRANSPARENT
+                && mBorderSize != 0;
         t.recycle();
 
         setScaleType(ScaleType.CENTER_CROP);
@@ -136,7 +153,6 @@ public class PolygonImageView extends ImageView {
         mFinalPaint = new Paint();
         mFinalPaint.setAntiAlias(true);//抗锯齿
 
-        mClearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
     }
 
 
@@ -147,7 +163,7 @@ public class PolygonImageView extends ImageView {
         boolean sizeChanged = width != oldw || height != oldh;
         boolean isValid = width > 0 && height > 0;
 
-        if (isValid){ //必须有效的数据
+        if (isValid && isClipPicture){ //必须有效的数据
             if(mClipModelBitmap == null) {
                 createClipBitmap(width, height);
             }
@@ -169,8 +185,6 @@ public class PolygonImageView extends ImageView {
             if (getDrawable() != null) {
                 calculateDrawableData();
             }
-
-            mScaleSize = 1 - 2F * mBorderSize / width;
         }
 
 
@@ -193,8 +207,8 @@ public class PolygonImageView extends ImageView {
         } else {
             translateX += (imageSize - scale * d.getIntrinsicWidth()) / 2F;
         }
-        mMatrix.setScale(scale, scale);
-        mMatrix.postTranslate(translateX, translateY);
+        mFinalMatrix.setScale(scale, scale);
+        mFinalMatrix.postTranslate(translateX, translateY);
     }
 
     /**
@@ -230,43 +244,44 @@ public class PolygonImageView extends ImageView {
         canvas.drawColor(mBorderColor, PorterDuff.Mode.SRC_IN);
     }
 
-    public void invalidate() {
-        isInvalidated = true;
-        super.invalidate();
-    }
 
 
 
     @Override
     protected void onDraw(Canvas oCanvas) {
-        XLog.v("onDraw");
-        if (getDrawable() != null) {
-            Canvas canvas = mFinalCanvas;
-            canvas.drawPaint(mClearPaint);
-            //画图像
-            canvas.save();
-            Drawable d = getDrawable();
-            canvas.clipRect(mImageRect);//裁剪为正方形
-            canvas.concat(mMatrix);
-            d.draw(canvas);
-            canvas.restore();
-            //扣形状
-            canvas.save();
-            canvas.translate(mBorderSize,mBorderSize);
-            canvas.scale(mClipSmallScale, mClipSmallScale);
-            mFinalPaint.setColor(Color.BLUE);
-            mFinalPaint.setXfermode(mDstInXfermode);
-            canvas.drawBitmap(mClipModelBitmap, 0, 0, mFinalPaint);
-            canvas.restore();
-            //画边界
-            canvas.save();
-            mFinalPaint.setXfermode(mDstOverInXfermode);
-            canvas.scale(mClipBigScale,mClipBigScale);
-            canvas.drawBitmap(mClipModelBitmap, 0, 0, mFinalPaint);
-            canvas.restore();
+        if(isClipPicture) {
+            if (getDrawable() != null) {
+                Canvas canvas = mFinalCanvas;
+                canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                //画图像
+                canvas.save();
+                Drawable d = getDrawable();
+                canvas.clipRect(mImageRect);//裁剪为正方形
+                canvas.concat(mFinalMatrix);
+                d.draw(canvas);
+                canvas.restore();
+                //扣形状
+                canvas.save();
+                canvas.translate(mBorderSize, mBorderSize);
+                canvas.scale(mClipSmallScale, mClipSmallScale);
+                mFinalPaint.setColor(Color.BLUE);
+                mFinalPaint.setXfermode(mDstInXfermode);
+                canvas.drawBitmap(mClipModelBitmap, 0, 0, mFinalPaint);
+                canvas.restore();
+                if(isDrawBorder) {
+                    //画边界
+                    canvas.save();
+                    mFinalPaint.setXfermode(mDstOverInXfermode);
+                    canvas.scale(mClipBigScale, mClipBigScale);
+                    canvas.drawBitmap(mClipModelBitmap, 0, 0, mFinalPaint);
+                    canvas.restore();
+                }
 
-            mFinalPaint.setXfermode(null);
-            oCanvas.drawBitmap(mFinalBitmap, 0, 0, mFinalPaint);
+                mFinalPaint.setXfermode(null);
+                oCanvas.drawBitmap(mFinalBitmap, 0, 0, mFinalPaint);
+            }
+        }else{
+            super.onDraw(oCanvas);
         }
 
     }
