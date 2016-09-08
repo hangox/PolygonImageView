@@ -282,6 +282,11 @@ public class PolygonImageView extends ImageView {
 
     }
 
+
+    /**
+     * 直接改变View的大小
+     * @param size
+     */
     public void setSize(int size){
         mViewSize = size;
     }
