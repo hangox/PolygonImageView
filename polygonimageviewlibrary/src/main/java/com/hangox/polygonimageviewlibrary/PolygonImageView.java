@@ -251,6 +251,7 @@ public class PolygonImageView extends ImageView {
         if(mClipModelBitmap != null && !mClipModelBitmap.isRecycled()) mClipModelBitmap.recycle();
         mClipModelBitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         mClipModelDrawable.setBounds(0, 0,cWidth, cHeight);
+        //注意这里不会对clip 图片进行重新定位,请传入方形的图片
         mClipCanvas = new Canvas(mClipModelBitmap);
         mClipModelDrawable.draw(mClipCanvas);
         setClipImageTint(mBorderColor);
