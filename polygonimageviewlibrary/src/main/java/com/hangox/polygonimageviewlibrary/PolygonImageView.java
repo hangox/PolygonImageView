@@ -158,16 +158,13 @@ public class PolygonImageView extends ImageView {
 
     @Override
     protected void onSizeChanged(int width, int height, int oldw, int oldh) {
-        XLog.v("onSizeChanged");
         super.onSizeChanged(width, height, oldw, oldh);
-        boolean sizeChanged = width != oldw || height != oldh;
+        boolean isSizeChanged = width != oldw || height != oldh;
         boolean isValid = width > 0 && height > 0;
 
         if (isValid && isClipPicture){ //必须有效的数据
-            if(mClipModelBitmap == null) {
+            if(isSizeChanged) {
                 createClipBitmap(width, height);
-            }
-            if(sizeChanged){
                 createFinalBitmap(width, height);
             }
 
@@ -229,13 +226,12 @@ public class PolygonImageView extends ImageView {
      * @param height
      */
     private void createClipBitmap(int width, int height) {
-        int cWidth = mClipModelDrawable.getIntrinsicWidth();
-        int cHeight = mClipModelDrawable.getIntrinsicHeight();
-        if(cWidth == 0 || cHeight == 0){
-            cWidth = width;
-            cHeight = height;
-        }
+        int cWidth, cHeight;
+
+        cWidth = width;
+        cHeight = height;
         int size = cWidth > cHeight ? cWidth : cHeight;
+        if(mClipModelBitmap != null && !mClipModelBitmap.isRecycled()) mClipModelBitmap.recycle();
         mClipModelBitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         mClipModelDrawable.setBounds(0, 0,cWidth, cHeight);
         Canvas canvas = new Canvas(mClipModelBitmap);
