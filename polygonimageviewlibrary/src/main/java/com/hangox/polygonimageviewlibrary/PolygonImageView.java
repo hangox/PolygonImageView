@@ -103,16 +103,10 @@ public class PolygonImageView extends ImageView {
      * view大小
      */
     private int mViewSize = Integer.MIN_VALUE;
-
     /**
-     * 是否绘制边界
+     * 裁剪图的Canvas
      */
-    private boolean isDrawBorder;
-
-    /**
-     * 是否裁剪图片
-     */
-    private boolean isClipPicture;
+    private Canvas mClipCanvas;
 
 
     public PolygonImageView(Context context) {
@@ -141,11 +135,6 @@ public class PolygonImageView extends ImageView {
         mBorderSize = t.getDimensionPixelSize(R.styleable.PolygonImageView_piv_borderWidth, 0);
         mClipModelDrawable = t.getDrawable(R.styleable.PolygonImageView_piv_polygonImage);
         mBorderColor = t.getColor(R.styleable.PolygonImageView_piv_borderColor, Color.WHITE);
-        isClipPicture = mClipModelDrawable != null;
-        //边界不为0,颜色不为透明,边界图不为空的时候绘画边界
-        isDrawBorder = mClipModelDrawable != null
-                && mBorderColor != Color.TRANSPARENT
-                && mBorderSize != 0;
         t.recycle();
 
         setScaleType(ScaleType.CENTER_CROP);
@@ -156,13 +145,36 @@ public class PolygonImageView extends ImageView {
     }
 
 
+    /**
+     * 是否裁剪图片
+     *
+     * @return
+     */
+    private boolean isClipPicture() {
+        return mClipModelDrawable != null;
+    }
+
+
+    /**
+     * 是否画边界
+     *
+     * @return
+     */
+    private boolean isDrawBorder() {
+        //边界不为0,颜色不为透明,边界图不为空的时候绘画边界
+        return isClipPicture()
+                && mBorderColor != Color.TRANSPARENT
+                && mBorderSize != 0;
+    }
+
+
     @Override
     protected void onSizeChanged(int width, int height, int oldw, int oldh) {
         super.onSizeChanged(width, height, oldw, oldh);
         boolean isSizeChanged = width != oldw || height != oldh;
         boolean isValid = width > 0 && height > 0;
 
-        if (isValid && isClipPicture){ //必须有效的数据
+        if (isValid && isClipPicture()) { //必须有效的数据
             if(isSizeChanged) {
                 createClipBitmap(width, height);
                 createFinalBitmap(width, height);
@@ -170,27 +182,32 @@ public class PolygonImageView extends ImageView {
 
             //设定边界
             mCanDrawRect.set(0, 0, getMeasuredWidth(), getMeasuredHeight());
-            //设定图片绘制的边界
-            mImageRect.set(mCanDrawRect);
-            mImageRect.inset(mBorderSize, mBorderSize);//偏移边距
+            updateImageRect();
             //算边框的放大缩小
             if(mClipModelBitmap != null){
-                mClipSmallScale = mImageRect.width() * 1F / mClipModelBitmap.getWidth();
+                updateImageScaleSize();
                 mClipBigScale = mCanDrawRect.width() * 1F / mClipModelBitmap.getWidth();
             }
+            calculateDrawableData();
 
-            if (getDrawable() != null) {
-                calculateDrawableData();
-            }
         }
+    }
 
+    private void updateImageRect() {
+        //设定图片绘制的边界
+        mImageRect.set(mCanDrawRect);
+        mImageRect.inset(mBorderSize, mBorderSize);//偏移边距
+    }
 
+    private void updateImageScaleSize(){
+        mClipSmallScale = mImageRect.width() * 1F / mClipModelBitmap.getWidth();
     }
 
     /**
      * 计算图片的数据
      */
     private void calculateDrawableData() {
+        if (getDrawable() == null) return;
         //计算图片的放大比率
         Drawable d = getDrawable();
         float imageSize = mViewSize - 2F * mBorderSize;
@@ -234,18 +251,22 @@ public class PolygonImageView extends ImageView {
         if(mClipModelBitmap != null && !mClipModelBitmap.isRecycled()) mClipModelBitmap.recycle();
         mClipModelBitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         mClipModelDrawable.setBounds(0, 0,cWidth, cHeight);
-        Canvas canvas = new Canvas(mClipModelBitmap);
-        mClipModelDrawable.draw(canvas);
-        //把图片变为边界颜色
-        canvas.drawColor(mBorderColor, PorterDuff.Mode.SRC_IN);
+        mClipCanvas = new Canvas(mClipModelBitmap);
+        mClipModelDrawable.draw(mClipCanvas);
+        setClipImageTint(mBorderColor);
     }
 
+
+    private void setClipImageTint(int borderColor) {
+        //把图片变为边界颜色
+        mClipCanvas.drawColor(borderColor, PorterDuff.Mode.SRC_IN);
+    }
 
 
 
     @Override
     protected void onDraw(Canvas oCanvas) {
-        if(isClipPicture) {
+        if (isClipPicture()) {
             if (getDrawable() != null) {
                 Canvas canvas = mFinalCanvas;
                 canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
@@ -264,7 +285,7 @@ public class PolygonImageView extends ImageView {
                 mFinalPaint.setXfermode(mDstInXfermode);
                 canvas.drawBitmap(mClipModelBitmap, 0, 0, mFinalPaint);
                 canvas.restore();
-                if(isDrawBorder) {
+                if (isDrawBorder()) {
                     //画边界
                     canvas.save();
                     mFinalPaint.setXfermode(mDstOverInXfermode);
@@ -272,8 +293,11 @@ public class PolygonImageView extends ImageView {
                     canvas.drawBitmap(mClipModelBitmap, 0, 0, mFinalPaint);
                     canvas.restore();
                 }
-
                 mFinalPaint.setXfermode(null);
+                //绘制背景
+                if (getBackground() != null) {
+                    getBackground().draw(oCanvas);
+                }
                 oCanvas.drawBitmap(mFinalBitmap, 0, 0, mFinalPaint);
             }
         }else{
@@ -291,6 +315,65 @@ public class PolygonImageView extends ImageView {
         mViewSize = size;
     }
 
+
+    /**
+     * 设置裁剪用的ImageDrawable
+     *
+     * @param drawable
+     */
+    public void setClipImageDrawable(Drawable drawable) {
+        mClipModelDrawable = drawable;
+        createClipBitmap(mViewSize, mViewSize);
+        postInvalidate();
+    }
+
+    /**
+     * 设置边界颜色
+     *
+     * @param color
+     */
+    public void setBorderColor(int color) {
+        if (mBorderColor != color) {
+            mBorderColor = color;
+            setClipImageTint(color);
+            postInvalidate();
+        }
+    }
+
+
+    /**
+     * 设置边界高度
+     *
+     * @param size
+     */
+    public void setBorderSize(int size) {
+        if (size != mBorderSize) {
+            mBorderSize = size;
+            updateImageRect();
+            calculateDrawableData();
+            if(mClipModelBitmap != null){
+                updateImageScaleSize();
+            }
+            postInvalidate();
+        }
+    }
+
+    public int getBorderColor() {
+        return mBorderColor;
+    }
+
+    public int getBorderSize() {
+        return mBorderSize;
+    }
+
+    /**
+     * 设置边界颜色
+     *
+     * @param resId
+     */
+    public void setBorderColorRes(int resId) {
+        setBorderColor(getResources().getColor(resId));
+    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
