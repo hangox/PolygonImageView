@@ -241,16 +241,19 @@ public class PolygonImageView extends ImageView {
      */
     private void createClipBitmap(int width, int height) {
         int cWidth, cHeight;
-
         cWidth = width;
         cHeight = height;
         int size = cWidth > cHeight ? cWidth : cHeight;
         if(mClipModelBitmap != null && !mClipModelBitmap.isRecycled()) mClipModelBitmap.recycle();
         mClipModelBitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        //记录下原来的大小,待会恢复回去
+        Rect originBounds = new Rect(mClipModelDrawable.getBounds());
         mClipModelDrawable.setBounds(0, 0,cWidth, cHeight);
         //注意这里不会对clip 图片进行重新定位,请传入方形的图片
         mClipCanvas = new Canvas(mClipModelBitmap);
         mClipModelDrawable.draw(mClipCanvas);
+        //恢复
+        mClipModelDrawable.setBounds(originBounds);
         setClipImageTint(mBorderColor);
     }
 
