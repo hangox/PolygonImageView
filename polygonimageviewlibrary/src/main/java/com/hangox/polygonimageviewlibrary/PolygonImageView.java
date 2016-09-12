@@ -23,6 +23,7 @@ import android.widget.ImageView;
  * User hangox
  * Date 06/09/2016
  * Time 9:44 AM
+ * 一个根据给定形状裁剪的ImageView
  */
 
 public class PolygonImageView extends ImageView {
