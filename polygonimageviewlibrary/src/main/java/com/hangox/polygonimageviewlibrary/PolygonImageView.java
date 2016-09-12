@@ -17,8 +17,6 @@ import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-import com.hangox.xlog.XLog;
-
 
 /**
  * Created With Android Studio
@@ -44,7 +42,6 @@ public class PolygonImageView extends ImageView {
      */
     private int mBorderSize;
 
-    private float mImageScale;
     /**
      * 多边形图像
      */
@@ -213,7 +210,6 @@ public class PolygonImageView extends ImageView {
         float imageSize = mViewSize - 2F * mBorderSize;
         float size = Math.min(d.getIntrinsicWidth(), d.getIntrinsicHeight());
         float scale = imageSize / size;
-        mImageScale = scale;
         float translateX = mBorderSize;
         float translateY = mBorderSize;
         if (d.getIntrinsicHeight() > d.getIntrinsicWidth()) {
@@ -282,7 +278,6 @@ public class PolygonImageView extends ImageView {
                 canvas.save();
                 canvas.translate(mBorderSize, mBorderSize);
                 canvas.scale(mClipSmallScale, mClipSmallScale);
-                mFinalPaint.setColor(Color.BLUE);
                 mFinalPaint.setXfermode(mDstInXfermode);
                 canvas.drawBitmap(mClipModelBitmap, 0, 0, mFinalPaint);
                 canvas.restore();
@@ -385,7 +380,6 @@ public class PolygonImageView extends ImageView {
             mViewSize = Math.min(width, height);
         }
         setMeasuredDimension(mViewSize, mViewSize);
-        XLog.v(width + ":" + height);
 
     }
 }
