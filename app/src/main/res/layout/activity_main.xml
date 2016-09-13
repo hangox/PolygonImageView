@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"/>
 
-        <com.hangox.polygonimageviewlibrary.PolygonImageView
+        <com.hangox.polygon.PolygonImageView
             android:id="@+id/image"
             android:layout_below="@id/tool_bar"
             android:layout_centerHorizontal="true"
@@ -27,7 +27,7 @@
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             app:piv_borderColor="@android:color/white"
             app:piv_borderWidth="18dp"
-            app:piv_polygonImage="@drawable/ic_mask_hex"/>
+            app:piv_clipImage="@drawable/ic_mask_hex"/>
 
 
         <android.support.v7.widget.RecyclerView

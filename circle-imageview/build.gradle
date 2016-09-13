@@ -1,22 +1,18 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.1"
+
     defaultConfig {
-        applicationId "com.hangox.polygonimageview"
         minSdkVersion 16
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        vectorDrawables.useSupportLibrary = true
-    }
 
-    dataBinding{
-        enabled true
     }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -26,15 +22,10 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:24.2.0'
     testCompile 'junit:junit:4.12'
-    compile 'com.hangox:xLog:1.0'
-    compile project(':polygon-imageview')
-    compile project(':circle-imageview')
-    compile 'com.android.support:recyclerview-v7:24.2.0'
-    compile 'com.github.QuadFlask:colorpicker:0.0.10'
+    compile project(":polygon-imageview")
 }

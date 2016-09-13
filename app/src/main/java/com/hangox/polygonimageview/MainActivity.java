@@ -24,7 +24,7 @@ import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.hangox.polygonimageview.databinding.ActivityMainBinding;
-import com.hangox.polygonimageviewlibrary.PolygonImageView;
+import com.hangox.polygon.PolygonImageView;
 
 import java.util.ArrayList;
 import java.util.Collections;

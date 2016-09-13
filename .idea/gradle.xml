@@ -9,8 +9,8 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/circleimageview" />
-            <option value="$PROJECT_DIR$/polygonimageviewlibrary" />
+            <option value="$PROJECT_DIR$/circle-imageview" />
+            <option value="$PROJECT_DIR$/polygon-imageview" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
