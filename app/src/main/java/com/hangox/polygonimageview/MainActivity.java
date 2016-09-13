@@ -1,7 +1,7 @@
 package com.hangox.polygonimageview;
 
 import android.content.DialogInterface;
-import android.content.res.TypedArray;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -12,6 +12,8 @@ import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -23,7 +25,6 @@ import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.hangox.polygonimageview.databinding.ActivityMainBinding;
 import com.hangox.polygonimageviewlibrary.PolygonImageView;
-import com.hangox.xlog.XLog;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,16 +42,16 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding mBinding;
 
     private Drawable createVectorDrawable(@DrawableRes int resId){
-        return VectorDrawableCompat.create(getResources(),resId,null);
+        return VectorDrawableCompat.create(getResources(), resId, null);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        setSupportActionBar(mBinding.toolBar);
 
         Drawable[] drawables ={
-                getResources().getDrawable(R.drawable.star),
                 getResources().getDrawable(R.drawable.ic_mask_hex),
                 createVectorDrawable(R.drawable.ic_cloud_black_24dp),
                 createVectorDrawable(R.drawable.ic_lens_black_24dp),
@@ -119,7 +120,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_activity,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.single_circle:
+                startActivity(new Intent(MainActivity.this,CircleDemoActivity.class));
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     public static class ClipImageViewHolder extends RecyclerView.ViewHolder{
         private ImageView mImageView;
@@ -155,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             ClipImageViewHolder viewHolder = (ClipImageViewHolder) v.getTag();
             Drawable drawable = mDrawableList.get(viewHolder.getAdapterPosition());
-            mBinding.image.setClipImageDrawable(drawable);
+            mBinding.image.setClipImageDrawable(drawable.mutate());
         }
     }
 }

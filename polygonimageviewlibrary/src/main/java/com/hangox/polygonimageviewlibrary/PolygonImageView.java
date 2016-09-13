@@ -128,7 +128,7 @@ public class PolygonImageView extends ImageView {
         setUp(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    private void setUp(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    protected void setUp(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         TypedArray t = context.obtainStyledAttributes(attrs, R.styleable.PolygonImageView, defStyleAttr, defStyleRes);
         mBorderSize = t.getDimensionPixelSize(R.styleable.PolygonImageView_piv_borderWidth, 0);
         mClipModelDrawable = t.getDrawable(R.styleable.PolygonImageView_piv_polygonImage);
@@ -240,6 +240,7 @@ public class PolygonImageView extends ImageView {
      * @param height
      */
     private void createClipBitmap(int width, int height) {
+        if(width  <=0 || height <= 0) return;
         int cWidth, cHeight;
         cWidth = width;
         cHeight = height;

@@ -1,1 +1,1 @@
-include ':app', ':polygonimageviewlibrary'
+include ':app', ':polygonimageviewlibrary', ':circleimageview'
