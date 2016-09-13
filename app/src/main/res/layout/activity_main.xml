@@ -23,6 +23,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/guo_ye"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
             app:piv_borderColor="@android:color/white"
             app:piv_borderWidth="18dp"
             app:piv_polygonImage="@drawable/ic_mask_hex"/>
@@ -30,6 +32,8 @@
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycle_view"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_width="match_parent"
             android:layout_alignParentBottom="true"
             android:layout_height="wrap_content"/>
@@ -37,12 +41,16 @@
         <Button
             android:id="@+id/picker_color"
             android:text="选择边框颜色"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_above="@id/recycle_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <SeekBar
             android:id="@+id/seek_bar"
             android:layout_above="@id/picker_color"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:max="80"
