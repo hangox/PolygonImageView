@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 
+
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.1"
@@ -19,13 +20,32 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lintOptions {
+        abortOnError false
+    }
+
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:24.2.0'
     testCompile 'junit:junit:4.12'
+    compile 'com.android.support:support-annotations:24.2.1'
 }
+
+ext{
+    eGroup = 'com.hangox'
+    eArtifactId = 'polygon-imageview'
+    eName = "polygonImageView"
+    eDescription = ''
+    eVersion = '1.0'
+    eVcsUrl = 'https://github.com/hangox/PolygonImageView.git'
+    eVcsTag = 'v1.0'
+    eWebsiteUrl = 'https://github.com/hangox/PolygonImageView'
+
+}
+
+
+apply from : "https://raw.githubusercontent.com/hangox/bintray-push/release/upload.gradle"

@@ -19,6 +19,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
+
 }
 
 dependencies {
@@ -27,5 +32,21 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     testCompile 'junit:junit:4.12'
-    compile project(":polygon-imageview")
+    compile 'com.hangox:polygon-imageview:1.0'
+//    compile project(':polygon-imageview')
 }
+
+ext{
+    eGroup = 'com.hangox'
+    eArtifactId = 'circle-imageview'
+    eName = "CircleImageView"
+    eDescription = ''
+    eVersion = '1.0'
+    eVcsUrl = 'https://github.com/hangox/PolygonImageView.git'
+    eVcsTag = 'v1.0'
+    eWebsiteUrl = 'https://github.com/hangox/PolygonImageView'
+
+}
+
+
+apply from : "https://raw.githubusercontent.com/hangox/bintray-push/master/upload.gradle"
