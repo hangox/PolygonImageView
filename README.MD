@@ -4,6 +4,7 @@
 ###演示
 <video id="video" controls="controls" preload="auto" autoplay="autoplay" poster="https://raw.githubusercontent.com/hangox/PolygonImageView/master/document/screenshot.jpg" style="width: 60%">
     <source id="mp4" src="https://raw.githubusercontent.com/hangox/PolygonImageView/master/document/show.mov">
+    Your browser does not support the video tag.
 </video>
 
 ###使用
