@@ -1,23 +1,27 @@
-#PolygonImageView
-###介绍
-一个可以自定义边框形状的ImageView
-###演示
-![](https://raw.githubusercontent.com/hangox/PolygonImageView/master/document/show.gif)
-###使用
+# PolygonImageView
 
-#####引用
+### 介绍
+一个可以自定义边框形状的ImageView
+
+### 演示
+
+![](https://raw.githubusercontent.com/hangox/PolygonImageView/master/document/show.gif)
+
+### 使用
+
+##### 引用
 ```gradle
 compile 'com.hangox:polygon-imageview:1.0'
 ```
 
-#####属性说明
+##### 属性说明
 `app:piv_borderColor` 边界的颜色
 `app:piv_borderWidth` 边界的宽度
 `app:piv_clipImage` 边界形状的图片
 
-#####例子
+##### 例子
 
-```
+```xml
  <com.hangox.polygon.PolygonImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -27,15 +31,15 @@ compile 'com.hangox:polygon-imageview:1.0'
             app:piv_clipImage="@drawable/ic_mask_hex"/>
 ```
 
-#CircleImageView
+# CircleImageView
 因为Circle 使用的频率比较高，所以我单独了一个Circle 控件
 
-###引用
+### 引用
 ```gradle
 compile 'com.hangox:circle-imageview:1.0' 
 ```
 
-###使用
+### 使用
 ```xml
 <com.hangox.circleimageview.CircleImageView
             app:piv_borderWidth="4dp"
